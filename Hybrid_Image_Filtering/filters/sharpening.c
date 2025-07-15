@@ -3,12 +3,12 @@
 
 void apply_sharpening(unsigned char **input, unsigned char **output, int height, int width) {
     int kernel[3][3] = {
-        { 0, -1,  0 },
-        {-1,  5, -1 },
-        { 0, -1,  0 }
+        {  0, -1,  0 },
+        { -1,  5, -1 },
+        {  0, -1,  0 }
     };
 
-    #pragma omp parallel for collapse(2)
+    #pragma omp parallel for num_threads(8) num_threads(8)
     for (int i = 1; i < height + 1; i++) {
         for (int j = 1; j < width - 1; j++) {
             int sum = 0;

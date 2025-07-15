@@ -33,8 +33,7 @@ int main(int argc, char *argv[]) {
     MPI_Comm_size(MPI_COMM_WORLD, &size);
 
     int chunk = HEIGHT / size;
-
-    unsigned char **input = allocate_2D(chunk + 2, WIDTH);
+    unsigned char **input = allocate_2D(chunk + 2, WIDTH);  
     unsigned char **output = allocate_2D(chunk, WIDTH);
 
     if (rank == 0) {
@@ -60,6 +59,9 @@ int main(int argc, char *argv[]) {
         }
     }
 
+    MPI_Barrier(MPI_COMM_WORLD);
+    double start_time = MPI_Wtime();
+
     if (strcmp(argv[1], "smooth") == 0)
         apply_smoothing(input, output, chunk, WIDTH);
     else if (strcmp(argv[1], "sharpen") == 0)
@@ -70,34 +72,39 @@ int main(int argc, char *argv[]) {
         apply_emboss(input, output, chunk, WIDTH);
     else {
         if (rank == 0)
-            printf("❌ Unknown filter: %s\n", argv[1]);
+            printf("Unknown filter: %s\n", argv[1]);
         MPI_Finalize();
         return 1;
     }
+
+    MPI_Barrier(MPI_COMM_WORLD);
+    double end_time = MPI_Wtime();
 
     if (rank == 0) {
         unsigned char full_output[HEIGHT][WIDTH];
         for (int i = 0; i < chunk; i++)
             memcpy(full_output[i], output[i], WIDTH);
-        for (int i = 1; i < size; i++) {
-            unsigned char *recv_buffer = malloc(chunk * WIDTH);
-            MPI_Recv(recv_buffer, chunk * WIDTH, MPI_UNSIGNED_CHAR, i, 1, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
-            for (int r = 0; r < chunk; r++)
-                memcpy(full_output[i * chunk + r], recv_buffer + r * WIDTH, WIDTH);
-            free(recv_buffer);
 
-        }
-        char output_file[100];
-        sprintf(output_file, "images/output/%s_output.pgm", argv[1]);
-        write_pgm(output_file, full_output);
-        printf("✅ %s filter saved to %s\n", argv[1], output_file);
-    } else {
-            unsigned char *send_buffer = malloc(chunk * WIDTH);
+        for (int i = 1; i < size; i++) {
+            unsigned char *recv_buf = malloc(chunk * WIDTH);
+            MPI_Recv(recv_buf, chunk * WIDTH, MPI_UNSIGNED_CHAR, i, 1, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
             for (int r = 0; r < chunk; r++)
-                memcpy(send_buffer + r * WIDTH, output[r], WIDTH);
-            MPI_Send(send_buffer, chunk * WIDTH, MPI_UNSIGNED_CHAR, 0, 1, MPI_COMM_WORLD);
-            free(send_buffer);
-            }
+                memcpy(full_output[i * chunk + r], recv_buf + r * WIDTH, WIDTH);
+            free(recv_buf);
+        }
+
+        char out_path[100];
+        sprintf(out_path, "images/output/%s_output.pgm", argv[1]);
+        write_pgm(out_path, full_output);
+        printf("%s filter saved to %s\n", argv[1], out_path);
+        printf("Computation Time: %.6f seconds\n", end_time - start_time);
+    } else {
+        unsigned char *send_buf = malloc(chunk * WIDTH);
+        for (int r = 0; r < chunk; r++)
+            memcpy(send_buf + r * WIDTH, output[r], WIDTH);
+        MPI_Send(send_buf, chunk * WIDTH, MPI_UNSIGNED_CHAR, 0, 1, MPI_COMM_WORLD);
+        free(send_buf);
+    }
 
     free_2D(input, chunk + 2);
     free_2D(output, chunk);

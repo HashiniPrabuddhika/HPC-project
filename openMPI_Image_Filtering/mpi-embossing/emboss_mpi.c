@@ -6,9 +6,9 @@
 #define HEIGHT 512
 
 int kernel[3][3] = {
-    { -2, -1,  0 },
-    { -1,  1,  1 },
-    {  0,  1,  2 }
+    { -2, -1, 0 },
+    { -1,  1, 1 },
+    {  0,  1, 2 }
 };
 
 int clamp(int value) {
@@ -116,7 +116,6 @@ int main(int argc, char *argv[]) {
     
     if (rank == 0) {
         write_pgm("emboss_output.pgm", result);
-        printf("Output written to emboss_output.pgm\n");
         printf("Total execution time: %.6f seconds\n", max_time);
 
         free(recvcounts);
