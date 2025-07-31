@@ -241,11 +241,24 @@ gcc compare_hybrid_Smoothing.c -o compare_hybrid_Smoothing -lm
 
 
 ### Performance Analysis
-<pre><code>### ⏱️ Execution Time Comparison (in seconds) | Filter | Serial (s) | OpenMP (s) | MPI (s) | Hybrid (s) | |----------------|------------|------------|-----------|------------| | Smoothing | 0.008325 | 0.003640 | 0.005461 | 0.002831 | | Sharpening | 0.007928 | 0.005312 | 0.003879 | 0.002092 | | Edge Detection | 0.010623 | 0.004645 | 0.016929 | 0.003626 | | Embossing | 0.008597 | 0.004633 | 0.016875 | 0.002149 | </code></pre>
+| Filter         | Serial (s) | OpenMP (s) | MPI (s) | Hybrid (s) |
+|----------------|------------|------------|---------|-------------|
+| Smoothing      | 0.008325   | 0.003640   | 0.005461| 0.002831    |
+| Sharpening     | 0.007928   | 0.005312   | 0.003879| 0.002092    |
+| Edge Detection | 0.010623   | 0.004645   | 0.016929| 0.003626    |
+| Embossing      | 0.008597   | 0.004633   | 0.016875| 0.002149    |
+
+
 
 
 ###### Perfect accuracy maintained across all parallel implementations (RMSE = 0.000)
 
-<pre><code>### ✅ RMSE and Accuracy Comparison | Filter Method | OpenMP RMSE | OpenMP Accuracy (%) | MPI RMSE | MPI Accuracy (%) | Hybrid RMSE | Hybrid Accuracy (%) | |-----------------|-------------|----------------------|----------|-------------------|-------------|----------------------| | Smoothing | 0.000000 | 100 | 0.000000 | 100 | 0.000000 | 100 | | Sharpening | 0.000000 | 100 | 0.000000 | 100 | 0.000000 | 100 | | Edge Detection | 0.000000 | 100 | 0.000000 | 100 | 0.000000 | 100 | | Embossing | 0.000000 | 100 | 0.000000 | 100 | 0.000000 | 100 | </code></pre>
+| Filter Method   | OpenMP RMSE | OpenMP Accuracy (%) | MPI RMSE | MPI Accuracy (%) | Hybrid RMSE | Hybrid Accuracy (%) |
+|-----------------|-------------|----------------------|----------|-------------------|-------------|----------------------|
+| Smoothing       | 0.000000    | 100                  | 0.000000 | 100               | 0.000000    | 100                  |
+| Sharpening      | 0.000000    | 100                  | 0.000000 | 100               | 0.000000    | 100                  |
+| Edge Detection  | 0.000000    | 100                  | 0.000000 | 100               | 0.000000    | 100                  |
+| Embossing       | 0.000000    | 100                  | 0.000000 | 100               | 0.000000    | 100                  |
+
 
 - All parallel implementations produce identical results to the serial version (RMSE = 0.000), confirming that parallelization maintains computational accuracy while improving performance.
