@@ -47,6 +47,9 @@ HPC-project/
 ├── Serial_Image_Filtering
 
 ```
+
+## Serial Implementation Diagram
+![Serial Implementation Diagram](Implementation_Diagram_images/SerialVersionDiagram.png)
 ## Usage Instructions
 1. Serial Implementation
    ``` bash
