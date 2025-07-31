@@ -38,6 +38,7 @@ sudo apt-get install gcc libpng-dev openmpi-bin openmpi-common libopenmpi-dev
 ```
 
 ## Project Structure
+``` bash
 HPC-project/
 ├── compare
 ├── Hybrid_Image_Filtering
@@ -45,7 +46,7 @@ HPC-project/
 ├── openMPI_Image_Filtering
 ├── Serial_Image_Filtering
 
-
+```
 ## Usage Instructions
 1. Serial Implementation
    ``` bash
