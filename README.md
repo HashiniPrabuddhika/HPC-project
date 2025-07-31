@@ -251,7 +251,7 @@ gcc compare_hybrid_Smoothing.c -o compare_hybrid_Smoothing -lm
 
 
 
-###### Perfect accuracy maintained across all parallel implementations (RMSE = 0.000)
+### Perfect accuracy maintained across all parallel implementations (RMSE = 0.000)
 
 | Filter Method   | OpenMP RMSE | OpenMP Accuracy (%) | MPI RMSE | MPI Accuracy (%) | Hybrid RMSE | Hybrid Accuracy (%) |
 |-----------------|-------------|----------------------|----------|-------------------|-------------|----------------------|
