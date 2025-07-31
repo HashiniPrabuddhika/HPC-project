@@ -59,7 +59,7 @@ void apply_filter(unsigned char input[HEIGHT][WIDTH],
                     sum += input[i + ki][j + kj] * kernel[ki + 1][kj + 1];
                 }
             }
-            output[i][j] = clamp(sum + 128); 
+            output[i][j] = clamp(sum); 
         }
     }
 }

@@ -8,7 +8,7 @@ void apply_edge_detection(unsigned char **input, unsigned char **output, int hei
         {-1, -1, -1}
     };
 
-    #pragma omp parallel for num_threads(8) num_threads(8)
+    #pragma omp parallel for num_threads(8) 
     for (int i = 1; i < height + 1; i++) {
         for (int j = 1; j < width - 1; j++) {
             int sum = 0;

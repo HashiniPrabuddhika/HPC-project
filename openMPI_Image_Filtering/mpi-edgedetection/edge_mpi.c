@@ -6,21 +6,15 @@
 #define WIDTH 512
 #define HEIGHT 512
 
-int Gx[3][3] = {
-    { -1,  0,  1 },
-    { -2,  0,  2 },
-    { -1,  0,  1 }
-};
-
-int Gy[3][3] = {
-    { -1, -2, -1 },
-    {  0,  0,  0 },
-    {  1,  2,  1 }
-};
-
 int clamp(int val) {
     return (val < 0) ? 0 : (val > 255) ? 255 : val;
 }
+
+int Laplacian[3][3] = {
+    { -1, -1, -1 },
+    { -1,  8, -1 },
+    { -1, -1, -1 }
+};
 
 void read_pgm(const char *filename, unsigned char image[HEIGHT][WIDTH]) {
     FILE *fp = fopen(filename, "r");
@@ -59,20 +53,18 @@ void write_pgm(const char *filename, unsigned char image[HEIGHT][WIDTH]) {
     fclose(fp);
 }
 
-void apply_edge_filter(unsigned char input[HEIGHT][WIDTH],
-                       unsigned char output[HEIGHT][WIDTH],
-                       int start, int end) {
+void apply_laplacian_filter(unsigned char input[HEIGHT][WIDTH],
+                            unsigned char output[HEIGHT][WIDTH],
+                            int start, int end) {
     for (int i = start; i < end; i++) {
         for (int j = 1; j < WIDTH - 1; j++) {
-            int gx = 0, gy = 0;
+            int sum = 0;
             for (int ki = -1; ki <= 1; ki++) {
                 for (int kj = -1; kj <= 1; kj++) {
-                    gx += input[i + ki][j + kj] * Gx[ki + 1][kj + 1];
-                    gy += input[i + ki][j + kj] * Gy[ki + 1][kj + 1];
+                    sum += input[i + ki][j + kj] * Laplacian[ki + 1][kj + 1];
                 }
             }
-            int magnitude = clamp((int)sqrt(gx * gx + gy * gy));
-            output[i][j] = magnitude;
+            output[i][j] = clamp(sum);
         }
     }
 }
@@ -87,7 +79,7 @@ int main(int argc, char *argv[]) {
     MPI_Comm_rank(MPI_COMM_WORLD, &rank);
     MPI_Comm_size(MPI_COMM_WORLD, &size);
 
-     MPI_Barrier(MPI_COMM_WORLD);
+    MPI_Barrier(MPI_COMM_WORLD);
     start_time = MPI_Wtime();
 
     if (rank == 0) {
@@ -104,7 +96,7 @@ int main(int argc, char *argv[]) {
     if (end >= HEIGHT - 1) end = HEIGHT - 1;
     int local_rows = end - start;
 
-    apply_edge_filter(image, result, start, end);
+    apply_laplacian_filter(image, result, start, end);
 
     int *recvcounts = NULL;
     int *displs = NULL;
@@ -130,11 +122,10 @@ int main(int argc, char *argv[]) {
 
     double local_time = end_time - start_time;
     MPI_Reduce(&local_time, &max_time, 1, MPI_DOUBLE, MPI_MAX, 0, MPI_COMM_WORLD);
-    
 
     if (rank == 0) {
         write_pgm("edge_output.pgm", result);
-        printf("Edge detection completed: edge_output.pgm\n");
+        printf("Edge detection (Laplacian) completed: edge_output.pgm\n");
         printf("Total execution time: %.6f seconds\n", max_time);
         free(recvcounts);
         free(displs);
@@ -143,4 +134,3 @@ int main(int argc, char *argv[]) {
     MPI_Finalize();
     return 0;
 }
-
